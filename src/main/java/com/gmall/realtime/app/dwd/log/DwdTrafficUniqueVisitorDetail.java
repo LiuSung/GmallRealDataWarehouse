@@ -7,11 +7,14 @@ import com.gmall.realtime.utils.KafkaUtil;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -37,11 +40,11 @@ public class DwdTrafficUniqueVisitorDetail {
         env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
         env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
+        System.setProperty("HADOOP_USER_NAME", "root");
         //TODO: 读取页面数据过滤脏数据
         String topic = "dwd_traffic_page_log";
         String groupid = "dwdtrafficuniquevisitordetail";
         DataStreamSource<String> StreamDS = env.fromSource(KafkaUtil.getKafkaSource(topic, groupid), WatermarkStrategy.noWatermarks(), "dwd_traffic_pagelog_source");
-
         OutputTag<String> DirtyTag = new OutputTag<String>("dirty") {};
         SingleOutputStreamOperator<String> UnDirtyDS = StreamDS.process(new ProcessFunction<String, String>() {
             @Override
@@ -54,18 +57,24 @@ public class DwdTrafficUniqueVisitorDetail {
                 }
             }
         });
+        DataStream<String> sideOutput = UnDirtyDS.getSideOutput(DirtyTag);
+        sideOutput.print("dirty>>>>>>>>>");
         //TODO: 数据去重
         //{"common":{"ar":"110000","uid":"61","os":"Android 11.0","ch":"web","is_new":"1","md":"Redmi k30","mid":"mid_404358","vc":"v2.1.132","ba":"Redmi"},
         // "page":{"page_id":"good_detail","item":"19","during_time":2326,"item_type":"sku_id","last_page_id":"good_list","source_type":"promotion"}
         // ,"ts":1705133387000}
         KeyedStream<String, String> keybyDs = UnDirtyDS.keyBy(s -> JSON.parseObject(s).getJSONObject("common").getString("mid"));
         SingleOutputStreamOperator<String> filterDS = keybyDs.filter(new RichFilterFunction<String>() {
-            private ValueState<String> CurrentDayValueStat = null;
-
+            private ValueState<String> CurrentDayValueState = null;
             @Override
             public void open(Configuration parameters) throws Exception {
                 ValueStateDescriptor<String> currentDayValueStat = new ValueStateDescriptor<>("CurrentDayValueStat", String.class);
-                CurrentDayValueStat = getRuntimeContext().getState(currentDayValueStat);
+                //设置状态TTL,状态生存时间是1天，当状态更新是TTL重置为1天
+                StateTtlConfig TtlConfig = new StateTtlConfig.Builder(Time.days(1))
+                        .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite).build();
+                currentDayValueStat.enableTimeToLive(TtlConfig);
+
+                CurrentDayValueState = getRuntimeContext().getState(currentDayValueStat);
             }
 
             @Override
@@ -73,8 +82,8 @@ public class DwdTrafficUniqueVisitorDetail {
                 JSONObject valueJSON = JSON.parseObject(value);
                 Long ts = valueJSON.getLong("ts");
                 String currdate = DateFormatUtil.toDate(ts);
-                if (CurrentDayValueStat == null || currdate.equals(CurrentDayValueStat)) {
-                    CurrentDayValueStat.update(currdate);
+                if (CurrentDayValueState == null || !currdate.equals(CurrentDayValueState.value())) {
+                    CurrentDayValueState.update(currdate);
                     return true;
                 } else {
                     return false;
@@ -83,7 +92,7 @@ public class DwdTrafficUniqueVisitorDetail {
         });
         //TODO: 数据写入主题
         String targetTopic = "dwd_traffic_unique_visitor_detail";
-        filterDS.addSink(KafkaUtil.getFlinkKafkaProducer("targetTopic"));
+        filterDS.addSink(KafkaUtil.getFlinkKafkaProducer(targetTopic));
         //TODO: 启动任务
         env.execute("DwdTrafficUniqueVisitorDetail");
 

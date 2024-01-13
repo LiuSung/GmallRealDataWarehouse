@@ -56,7 +56,7 @@ public class BaseLogApp {
             }
         });
         DataStream<String> DirtySideOutPut = JsonDs.getSideOutput(dirty);
-        DirtySideOutPut.print(">>>>>>>>>>>");
+        DirtySideOutPut.print("dirty>>>>>>>>>>>");
 
         //TODO: 拆分数据类型写入测输出流，启动、页面、曝光、动作、错误
 
