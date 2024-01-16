@@ -184,13 +184,15 @@
 
    - unionDs写入dwd_traffic_user_jump_detail主题。
 
-   - 执行操作。
+   - 执行操作
 
-     
+   - 上述方法可以解决乱序问题(beigin、next 严格近邻+winthin开窗口)
+     - 例如连续的两条last_page_id=null的数据时间分别是15、17，只有当水位线推进到18时数据15才输出，因为水位线为18时说明18之前的数据全部到齐，这时才说明15和17是next关系。（这样可以防止16.5这样的数据迟到）
+   
 
    ![image-20240116112904252](https://raw.githubusercontent.com/LiuSung/Images/main/img/202401161129598.png)
 
    
-
+   
    
 
