@@ -50,4 +50,42 @@ public class KafkaUtil {
     public static FlinkKafkaProducer<String> getFlinkKafkaProducer(String topic){
         return new FlinkKafkaProducer<>(kafkaServer,topic,new SimpleStringSchema());
     }
+
+    public static String getKafkaDDL(String topic,String groupid){
+        return "WITH (" +
+                "  'connector' = 'kafka'," +
+                "  'topic' = '"+topic+"'," +
+                "  'properties.bootstrap.servers' = '"+GmallConfig.KAFKA_SERVER+"'," +
+                "  'properties.group.id' = '"+groupid+"'," +
+                "  'scan.startup.mode' = 'group-offsets'," +
+                "  'format' = 'json'" +
+                ")";
+    }
+
+    public static String getKafkaSinkDDL(String topic){
+        return "WITH (" +
+                "  'connector' = 'kafka'," +
+                "  'topic' = '"+topic+"'," +
+                "  'properties.bootstrap.servers' = '"+GmallConfig.KAFKA_SERVER+"'," +
+                "  'scan.startup.mode' = 'group-offsets'," +
+                "  'format' = 'json'" +
+                ")";
+    }
+
+    /**
+     * topic_db 主题数据的Kafka-Source DDL语句
+     * @param groupid 消费者组
+     * @return
+     */
+    public static String getTopicDb(String groupid){
+        return "CREATE TABLE `topic_db` (\n" +
+                "  `database` STRING,\n" +
+                "  `table` STRING,\n" +
+                "  `type` STRING,\n" +
+                "  `data` MAP<STRING,STRING>,\n" +
+                "  `old` MAP<STRING,STRING>,\n" +
+                "  `pt` AS PROCTIME()\n" +
+                ")" + getKafkaDDL("topic_db",groupid);
+    }
+
 }
