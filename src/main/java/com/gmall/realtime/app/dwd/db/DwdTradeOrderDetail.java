@@ -115,7 +115,7 @@ public class DwdTradeOrderDetail {
         //TODO 5. 将数据写入kafka
         tableEnv.executeSql("insert into dwd_trade_order_detail select * from order_table").print();
         //TODO 6. 执行环境
-        env.execute();
+        env.execute("dwdtradeorderdetail");
     }
 
 }

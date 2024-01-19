@@ -117,6 +117,6 @@ public class DwdTradeCancelDetail {
         //TODO 5. 取消订单数据写入表
         tableEnv.executeSql("insert into dwd_trade_cancel_detail select * from filtered_table").print();
         //TODO 6. 执行程序
-        env.execute();
+        env.execute("dwdtradecanceldetail");
     }
 }
