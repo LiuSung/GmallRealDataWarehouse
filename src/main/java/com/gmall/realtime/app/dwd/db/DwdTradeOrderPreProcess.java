@@ -9,6 +9,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
+import java.time.Duration;
+
 public class DwdTradeOrderPreProcess {
     public static void main(String[] args) throws Exception {
         //TODO 1. 获取执行环境
@@ -25,6 +27,7 @@ public class DwdTradeOrderPreProcess {
 //        env.setStateBackend(new HashMapStateBackend());
 //        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
 //        System.setProperty("HADOOP_USER_NAME", "root");
+        tableEnv.getConfig().setIdleStateRetention(Duration.ofSeconds(5));
         //TODO 2. 创建topic_表
         tableEnv.executeSql(KafkaUtil.getTopicDb("dwdtradeorderpreprocess"));
         //TODO 3. 过滤出订单明细数据

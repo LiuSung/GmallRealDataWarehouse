@@ -6,12 +6,16 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
+import java.time.Duration;
+
 public class DwdTradeCartAdd {
     public static void main(String[] args) throws Exception {
         //TODO 1.获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+        // 设置flink sql join 状态的TTL
+        tableEnv.getConfig().setIdleStateRetention(Duration.ofSeconds(5));
         //TODO 2.使用DDL方式读取topic_db主题的数据创建表
         tableEnv.executeSql(KafkaUtil.getTopicDb("dwdtradecartadd"));
         //TODO 3.过滤出加购数据
