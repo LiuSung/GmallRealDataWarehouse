@@ -71,6 +71,15 @@ public class KafkaUtil {
                 "  'format' = 'json'" +
                 ")";
     }
+    public static String getKafkaUpsertSinkDDL(String topic){
+        return "WITH (" +
+                "  'connector' = 'upsert-kafka'," +
+                "  'topic' = '"+topic+"'," +
+                "  'properties.bootstrap.servers' = '"+GmallConfig.KAFKA_SERVER+"'," +
+                "  'key.format' = 'json'," +
+                "  'value.format' = 'json'" +
+                ")";
+    }
 
     /**
      * topic_db 主题数据的Kafka-Source DDL语句

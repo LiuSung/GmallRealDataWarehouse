@@ -33,10 +33,10 @@ public class DwdTradeCartAdd {
                 "from topic_db " +
                 "where `database` = 'gmall' " +
                 "and `table` = 'cart_info' " +
-                "and `type` = 'insert'  " +
+                "and (`type` = 'insert'  " +
                 "or (`type` = 'update' " +
                 "  and `old`['sku_num'] is not null " +
-                "  and cast(`data`['sku_num'] as int) > cast(`old`['sku_num'] as int))");
+                "  and cast(`data`['sku_num'] as int) > cast(`old`['sku_num'] as int)))");
         tableEnv.createTemporaryView("cart_info_table",cartAddTable);
         //TODO 4.读取MySQL的base_dic表作为lookup表
         tableEnv.executeSql(MysqlUtil.getBaseDicLookUpDDL());
