@@ -9,6 +9,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
+import java.time.Duration;
+
 public class DwdTradePayDetail {
     public static void main(String[] args) throws Exception {
         //TODO: 1. 获取执行环境
@@ -22,6 +24,7 @@ public class DwdTradePayDetail {
 //        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
 //        System.setProperty("HADOOP_USER_NAME","root");
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+        tableEnv.getConfig().setIdleStateRetention(Duration.ofSeconds(905));
         //TODO: 2. 获取kafka topic_db表数据
         tableEnv.executeSql(KafkaUtil.getTopicDb("dwdtradepaydeatil"));
         //TODO: 3. 过滤出支付成功数据
