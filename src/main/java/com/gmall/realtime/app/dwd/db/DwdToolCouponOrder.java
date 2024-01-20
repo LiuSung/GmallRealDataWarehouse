@@ -27,10 +27,10 @@ public class DwdToolCouponOrder {
 //        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
 //        System.setProperty("HADOOP_USER_NAME", "root");
 
-        // TODO 3. 从 Kafka 读取业务数据，封装为 Flink SQL 表
+        // TODO 2. 从 Kafka 读取业务数据，封装为 Flink SQL 表
         tableEnv.executeSql(KafkaUtil.getTopicDb("dwdtoolcouponorder"));
 
-        // TODO 4. 读取优惠券领用表数据，筛选满足条件的优惠券下单数据
+        // TODO 3. 读取优惠券领用表数据，筛选满足条件的优惠券下单数据
         Table couponUseOrder = tableEnv.sqlQuery("select " +
                 "data['id'] id, " +
                 "data['coupon_id'] coupon_id, " +
@@ -46,7 +46,7 @@ public class DwdToolCouponOrder {
 
         tableEnv.createTemporaryView("result_table", couponUseOrder);
 
-        // TODO 5. 建立 Kafka-Connector dwd_tool_coupon_order 表
+        // TODO 4. 建立 Kafka-Connector dwd_tool_coupon_order 表
         tableEnv.executeSql("create table dwd_tool_coupon_order( " +
                 "id string, " +
                 "coupon_id string, " +
@@ -56,7 +56,7 @@ public class DwdToolCouponOrder {
                 "order_time string " +
                 ")" + KafkaUtil.getKafkaSinkDDL("dwd_tool_coupon_order"));
 
-        // TODO 6. 将数据写入 Kafka-Connector 表
+        // TODO 5. 将数据写入 Kafka-Connector 表
         tableEnv.executeSql("" +
                 "insert into dwd_tool_coupon_order select " +
                 "id, " +

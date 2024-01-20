@@ -31,10 +31,10 @@ public class DwdToolCouponPay {
 //        System.setProperty("HADOOP_USER_NAME", "root");
 
 
-        // TODO 3. 从 Kafka 读取业务数据，封装为 Flink SQL 表
+        // TODO 2. 从 Kafka 读取业务数据，封装为 Flink SQL 表
         tableEnv.executeSql(KafkaUtil.getTopicDb("dwdtoolcouponpay"));
 
-        // TODO 4. 读取优惠券领用表数据，筛选优惠券使用（支付）数据
+        // TODO 3. 读取优惠券领用表数据，筛选优惠券使用（支付）数据
         Table couponUsePay = tableEnv.sqlQuery("select " +
                 "data['id'] id, " +
                 "data['coupon_id'] coupon_id, " +
@@ -50,7 +50,7 @@ public class DwdToolCouponPay {
 
         tableEnv.createTemporaryView("coupon_use_pay", couponUsePay);
 
-        // TODO 5. 建立 Kafka-Connector dwd_tool_coupon_order 表
+        // TODO 4. 建立 Kafka-Connector dwd_tool_coupon_order 表
         tableEnv.executeSql("create table dwd_tool_coupon_pay( " +
                 "id string, " +
                 "coupon_id string, " +
@@ -60,7 +60,7 @@ public class DwdToolCouponPay {
                 "payment_time string " +
                 ")" + KafkaUtil.getKafkaSinkDDL("dwd_tool_coupon_pay"));
 
-        // TODO 6. 将数据写入 Kafka-Connector 表
+        // TODO 5. 将数据写入 Kafka-Connector 表
         tableEnv.executeSql("" +
                 "insert into dwd_tool_coupon_pay select " +
                 "id, " +
