@@ -12,4 +12,10 @@ public class GmallConfig {
 
     // Kafka就能
     public static final String KAFKA_SERVER = "192.168.141.100:9092,192.168.141.101:9092,192.168.141.102:9092";
+
+    // ClickHouse 驱动
+    public static final String CLICKHOUSE_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
+
+    // ClickHouse 连接 URL
+    public static final String CLICKHOUSE_URL = "jdbc:clickhouse://192.168.141.100:8123/gmall_rebuild";
 }
