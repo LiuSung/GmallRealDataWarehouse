@@ -2,6 +2,7 @@ package com.gmall.realtime.app.dws;
 
 import com.gmall.realtime.app.func.SplitFunction;
 import com.gmall.realtime.bean.KeywordBean;
+import com.gmall.realtime.utils.ClickHouseUtil;
 import com.gmall.realtime.utils.KafkaUtil;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -61,7 +62,9 @@ public class DwsTrafficSourceKeywordPageViewWindow {
         //TODO 6. 将动态表转换为流
         DataStream<KeywordBean> KeywordBeanAppendStream = tableEnv.toAppendStream(countTable, KeywordBean.class);
         //TODO 7. 将数据写出到ClikHouse
-        KeywordBeanAppendStream.addSink()
+        KeywordBeanAppendStream.print(">>>>>>");
+        KeywordBeanAppendStream.addSink(ClickHouseUtil.getSinkFuction("insert into dws_traffic_source_keyword_page_view_window " +
+                "values(?,?,?,?,?,?)"));
         //TODO 8. 启动任务
         env.execute("dwstrafficsourcekeywordpageviewwindow");
     }
