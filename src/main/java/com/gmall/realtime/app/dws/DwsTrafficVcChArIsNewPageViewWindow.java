@@ -88,7 +88,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
         //TODO 3. 统一数据格式进行union
         DataStream<TrafficPageViewBean> union = trafficPageViewWithUv.union(trafficPageViewWithUj).union(trafficPageViewWithPage);
         //TODO 4. 提取事件时间生成WarterMark
-        WatermarkStrategy<TrafficPageViewBean> trafficPageViewBeanWatermarkStrategy = WatermarkStrategy.<TrafficPageViewBean>forBoundedOutOfOrderness(Duration.ofSeconds(14L)).withTimestampAssigner(new SerializableTimestampAssigner<TrafficPageViewBean>() {
+        WatermarkStrategy<TrafficPageViewBean> trafficPageViewBeanWatermarkStrategy = WatermarkStrategy.<TrafficPageViewBean>forBoundedOutOfOrderness(Duration.ofSeconds(14)).withTimestampAssigner(new SerializableTimestampAssigner<TrafficPageViewBean>() {
             @Override
             public long extractTimestamp(TrafficPageViewBean trafficPageViewBean, long l) {
                 return trafficPageViewBean.getTs();
