@@ -31,3 +31,21 @@
 #### 目标效果
 
 ![image-20240123230917391](https://raw.githubusercontent.com/LiuSung/Images/main/img/202401232309161.png)
+
+### 需求二：版本渠道地区访客类别页面浏览需求
+
+以版本、渠道、地区、访客维度作为key做分区，求独立访客数、用户跳出数、页面浏览数、浏览时间、会话数，并写到ClickHouse
+
+#### DataStream Api
+
+1. fromSource 算子读取dwd_traffic_unique_visitor_detail、dwd_traffic_user_jump_detail、dwd_traffic_page_log主题的数据，将String对象转换成TrafficPageViewBean(包含窗口开始时间、截至时间、版本、渠道、地区、访客类型、独立访客数、用户跳出数、页面浏览数、页面浏览时间、会话数、ts数据产生时间戳)对象。
+2. 三条数据流做union。
+3. 提出事件事件生成WarterMark（水位线延迟时间设置为14s）。
+4. 按照版本、渠道、地区、访客做keyby。
+5. 使用reduce进行增量聚合（采用增量与全量结合的api，目的是利用全量的api获取窗口的开始与结束时间）
+6. 将TrafficPageViewBean数据写入ClickHouse。
+7. 启动任务执行。
+
+#### 目标效果
+
+![image-20240129200647271](https://raw.githubusercontent.com/LiuSung/Images/main/img/202401292006687.png)
