@@ -58,7 +58,8 @@ public class DwdTradePayDetail {
                 "    `source_type_name` string,  " +
                 "    `split_activity_amount` string,  " +
                 "    `split_coupon_amount` string,  " +
-                "    `split_total_amount` string " +
+                "    `split_total_amount` string, " +
+                "    `row_op_ts` TIMESTAMP_LTZ(3) " +
                 ") " + KafkaUtil.getKafkaDDL("dwd_trade_order_detail","dwdtradepaydeatil"));
         //TODO: 5. 获取mysql base_dic数据
         tableEnv.executeSql(MysqlUtil.getBaseDicLookUpDDL());
@@ -83,7 +84,8 @@ public class DwdTradePayDetail {
                 "od.sku_num, " +
                 "od.split_activity_amount, " +
                 "od.split_coupon_amount, " +
-                "od.split_total_amount split_payment_amount " +
+                "od.split_total_amount split_payment_amount, " +
+                "od.row_op_ts row_op_ts " +
                 "from payment_info pi " +
                 "join dwd_trade_order_detail od " +
                 "on pi.order_id = od.order_id " +
@@ -110,7 +112,8 @@ public class DwdTradePayDetail {
                 "    sku_num string, " +
                 "    split_activity_amount string, " +
                 "    split_coupon_amount string, " +
-                "    split_payment_amount string " +
+                "    split_payment_amount string, " +
+                "    row_op_ts TIMESTAMP_LTZ(3) " +
                 ")" + KafkaUtil.getKafkaSinkDDL("dwd_trade_pay_detail"));
         //TODO: 8. 支付数据写入
         tableEnv.executeSql("insert into dwd_trade_pay_detail select * from result_table").print();

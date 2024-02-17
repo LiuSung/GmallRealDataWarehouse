@@ -158,7 +158,8 @@ public class DwdTradeOrderPreProcess {
                 "    oc.coupon_id, " +
                 "    oc.coupon_use_id, " +
                 "    oi.`type`, " +
-                "    oi.`old` " +
+                "    oi.`old`, " +
+                "    current_row_timestamp() row_op_ts " +
                 "from order_detail_table od " +
                 "join order_info_table oi " +
                 "on od.order_id = oi.id " +
@@ -215,6 +216,7 @@ public class DwdTradeOrderPreProcess {
                 "    `coupon_use_id` string, " +
                 "    `type` string, " +
                 "    `old` map<string, string>, " +
+                "     row_op_ts TIMESTAMP_LTZ(3), " +
                 "     PRIMARY KEY (order_id) NOT ENFORCED " +
                 ") " + KafkaUtil.getKafkaUpsertSinkDDL("dwd_trade_order_pre_process"));
         //TODO 10. 将数据写出
