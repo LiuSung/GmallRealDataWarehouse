@@ -54,9 +54,9 @@ public class DwsTradeCartAddUuWindow {
                 String operateTime = JSON.parseObject(s).getString("operate_time");
                 String createTime = JSON.parseObject(s).getString("create_time");
                 if (operateTime != null) {
-                    return DateFormatUtil.toTs(operateTime);
+                    return DateFormatUtil.toTs(operateTime,true);
                 } else {
-                    return DateFormatUtil.toTs(createTime);
+                    return DateFormatUtil.toTs(createTime,true);
                 }
             }
         });
@@ -80,14 +80,14 @@ public class DwsTradeCartAddUuWindow {
                 String operateTime = JSON.parseObject(s).getString("operate_time");
                 String createTime = JSON.parseObject(s).getString("create_time");
                 if (operateTime != null) {
-                    Long ts = DateFormatUtil.toTs(operateTime);
-                    if (cartAddlast == null || !cartAddlast.value().equals(DateFormatUtil.toDate(ts))) {
+                    Long ts = DateFormatUtil.toTs(operateTime,true);
+                    if (cartAddlast.value() == null || !cartAddlast.value().equals(DateFormatUtil.toDate(ts))) {
                         cartAddUuCt = 1L;
                         cartAddlast.update(DateFormatUtil.toDate(ts));
                     }
                 } else {
-                    Long ts = DateFormatUtil.toTs(createTime);
-                    if (cartAddlast == null || !cartAddlast.value().equals(DateFormatUtil.toDate(ts))) {
+                    Long ts = DateFormatUtil.toTs(createTime,true);
+                    if (cartAddlast.value() == null || !cartAddlast.value().equals(DateFormatUtil.toDate(ts))) {
                         cartAddUuCt = 1L;
                         cartAddlast.update(DateFormatUtil.toDate(ts));
                     }
