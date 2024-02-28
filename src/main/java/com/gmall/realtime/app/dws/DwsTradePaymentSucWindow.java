@@ -37,13 +37,13 @@ public class DwsTradePaymentSucWindow {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        env.setStateBackend(new HashMapStateBackend());
-        env.enableCheckpointing(10 * 60000L,CheckpointingMode.EXACTLY_ONCE);
-        env.getCheckpointConfig().setCheckpointTimeout(10 * 60000L);
-        env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
-        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
-        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
-        System.setProperty("HADOOP_USER_NAME","root");
+//        env.setStateBackend(new HashMapStateBackend());
+//        env.enableCheckpointing(10 * 60000L,CheckpointingMode.EXACTLY_ONCE);
+//        env.getCheckpointConfig().setCheckpointTimeout(10 * 60000L);
+//        env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
+//        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
+//        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
+//        System.setProperty("HADOOP_USER_NAME","root");
         //TODO 2. 获取dwd层支付成功数据
         String topic = "dwd_trade_pay_detail";
         String group_id = "dwstradepaymentsucwindow74033";
@@ -119,8 +119,8 @@ public class DwsTradePaymentSucWindow {
             public void flatMap(JSONObject jsonObject, Collector<TradePaymentWindowBean> collector) throws Exception {
                 String lastDt = lastValueState.value();
                 String currentDt = jsonObject.getString("callback_time").split(" ")[0];
-                Long paymentSucUniqueUserCount = 0L;
-                Long paymentSucNewUserCount = 0L;
+                long paymentSucUniqueUserCount = 0L;
+                long paymentSucNewUserCount = 0L;
                 if (lastDt == null) {
                     paymentSucUniqueUserCount = 1L;
                     paymentSucNewUserCount = 1L;
@@ -137,8 +137,8 @@ public class DwsTradePaymentSucWindow {
             }
         });
         //TODO 7. 开窗进行聚合（增量&全量结合方式进行计算）
-        AllWindowedStream<TradePaymentWindowBean, TimeWindow> windowsAllDs = SingleUserDs.windowAll(TumblingEventTimeWindows.of(Time.seconds(10)));
-        SingleOutputStreamOperator<TradePaymentWindowBean> resultDs = windowsAllDs.reduce(new ReduceFunction<TradePaymentWindowBean>() {
+        AllWindowedStream<TradePaymentWindowBean, TimeWindow> windowsDs = SingleUserDs.windowAll(TumblingEventTimeWindows.of(Time.seconds(10)));
+        SingleOutputStreamOperator<TradePaymentWindowBean> resultDs = windowsDs.reduce(new ReduceFunction<TradePaymentWindowBean>() {
             @Override
             public TradePaymentWindowBean reduce(TradePaymentWindowBean value1, TradePaymentWindowBean value2) throws Exception {
                 value1.setPaymentSucNewUserCount(value1.getPaymentSucNewUserCount() + value2.getPaymentSucNewUserCount());
@@ -152,8 +152,10 @@ public class DwsTradePaymentSucWindow {
                 next.setStt(DateFormatUtil.toYmdHms(timeWindow.getStart()));
                 next.setEdt(DateFormatUtil.toYmdHms(timeWindow.getEnd()));
                 next.setTs(System.currentTimeMillis());
+                collector.collect(next);
             }
         });
+        resultDs.print();
         //TODO 8. 将数据写入到clickhouse
         resultDs.addSink(ClickHouseUtil.getSinkFuction("insert into dws_trade_payment_suc_window values(?,?,?,?,?)"));
         //TODO 9. 执行
