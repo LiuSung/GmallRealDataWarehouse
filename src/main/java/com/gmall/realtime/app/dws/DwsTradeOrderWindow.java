@@ -117,21 +117,29 @@ public class DwsTradeOrderWindow {
                 long orderUniqueUserCount = 0L;
                 long orderNewUserCount = 0L;
                 String currDate = jsonObject.getString("create_time").split(" ")[0];
-                if (lastDate == null) {
+                if (lastDate.value() == null) {
                     orderUniqueUserCount = 1L;
                     orderNewUserCount = 1L;
                     lastDate.update(currDate);
                 } else {
-                    if (lastDate.value().equals(currDate)) {
+                    if (!lastDate.value().equals(currDate)) {
                         orderUniqueUserCount = 1L;
                     }
                 }
                 Integer skuNum = jsonObject.getInteger("sku_num");
+                Double splitActivityAmount = jsonObject.getDouble("split_activity_amount");
+                if(splitActivityAmount == null){
+                    splitActivityAmount = (double) 0;
+                }
+                Double splitCouponAmount = jsonObject.getDouble("split_coupon_amount");
+                if(splitCouponAmount == null){
+                    splitCouponAmount = (double) 0;
+                }
                 Double orderPrice = jsonObject.getDouble("order_price");
                 TradeOrderBean tradeOrderBean = new TradeOrderBean("", "", orderUniqueUserCount, orderNewUserCount,
-                        jsonObject.getDouble("split_activity_amount"),
-                        jsonObject.getDouble("split_coupon_amount"),
-                        skuNum * orderPrice, null
+                        splitActivityAmount,
+                        splitCouponAmount,
+                        skuNum * orderPrice, 0L
                 );
                 collector.collect(tradeOrderBean);
             }
@@ -155,10 +163,11 @@ public class DwsTradeOrderWindow {
                 next.setStt(DateFormatUtil.toYmdHms(timeWindow.getStart()));
                 next.setEdt(DateFormatUtil.toYmdHms(timeWindow.getEnd()));
                 next.setTs(System.currentTimeMillis());
+                collector.collect(next);
             }
         });
         //TODO 10.写到Clickhouse
-        resultDs.addSink(ClickHouseUtil.getSinkFuction("insert into insert into dws_trade_order_window values(?,?,?,?,?,?,?,?)"));
+        resultDs.addSink(ClickHouseUtil.getSinkFuction("insert into dws_trade_order_window values(?,?,?,?,?,?,?,?)"));
         //TODO 11.执行环境
         env.execute("dwstradeorderwindow");
     }
