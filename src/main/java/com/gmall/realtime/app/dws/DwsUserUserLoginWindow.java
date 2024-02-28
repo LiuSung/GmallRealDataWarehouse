@@ -74,7 +74,7 @@ public class DwsUserUserLoginWindow {
                 //过滤登陆数据，登陆分为自动登陆和手动登陆，前者的uid!=null && last_page_id==null，后者last_page_id=login
                 if ((jsonObject.getJSONObject("common").getString("uid") != null && jsonObject.getJSONObject("page").getString("last_page_id") == null)
                         || jsonObject.getJSONObject("page").getString("last_page_id").equals("login")) {
-                    if (userLastLoginState == null) {
+                    if (userLastLoginState.value() == null) {
                         uuCt = 1L;
                         userLastLoginState.update(date);
                     } else {
@@ -86,7 +86,7 @@ public class DwsUserUserLoginWindow {
                             if (cutDays > 8) {
                                 backCt = 1L;
                             }
-
+                            userLastLoginState.update(date);
                         }
                     }
                 }
