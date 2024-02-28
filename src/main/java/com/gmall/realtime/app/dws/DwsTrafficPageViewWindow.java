@@ -100,7 +100,7 @@ public class DwsTrafficPageViewWindow {
                         homeUvCt = 1L;
                         homeLastState.update(date);
                     }
-                } else if ("good_detail".equals(goodDetail)) {
+                } else if ("good_detail".equals(page_id)) {
                     if (goodDetail == null || !date.equals(goodDetail)) {
                         detailUvCt = 1L;
                         goodDetailState.update(date);
@@ -130,6 +130,7 @@ public class DwsTrafficPageViewWindow {
                 collector.collect(next);
             }
         });
+        redultDs.print();
         //TODO 6. 将数据写入到clickhouse
         redultDs.addSink(ClickHouseUtil.getSinkFuction("insert into dws_traffic_page_view_window values(?,?,?,?,?)"));
         //TODO 7. 执行环境
