@@ -75,6 +75,7 @@ public class DwdTradeOrderDetail {
         Table orderTable = tableEnv.sqlQuery("select " +
                 "    `id`,  " +
                 "    `order_id`,  " +
+                "    `order_price`, " +
                 "    `user_id`,  " +
                 "    `sku_id`,  " +
                 "    `sku_name`,  " +
@@ -98,6 +99,7 @@ public class DwdTradeOrderDetail {
         tableEnv.executeSql("create table dwd_trade_order_detail( " +
                 "    `id` string,  " +
                 "    `order_id` string,  " +
+                "    `order_price` string, " +
                 "    `user_id` string,  " +
                 "    `sku_id` string,  " +
                 "    `sku_name` string,  " +
