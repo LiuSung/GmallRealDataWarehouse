@@ -18,6 +18,7 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import scala.tools.nsc.transform.patmat.Logic;
 
 import java.time.Duration;
 
@@ -41,7 +42,7 @@ public class DwsUserUserRegisterWindow {
             @Override
             public long extractTimestamp(String s, long l) {
 
-                return DateFormatUtil.toTs(JSON.parseObject(s).getString("create_time"));
+                return DateFormatUtil.toTs(JSON.parseObject(s).getString("create_time"), true);
             }
         });
         String topic = "dwd_user_register";
