@@ -67,7 +67,7 @@
 
 ![image-20240228221909959](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402282219284.png)
 
-### 需求三：用户登录各窗口汇总表
+### 需求四：用户登录各窗口汇总表
 
 从 Kafka 页面日志主题读取数据，统计七日回流用户和当日独立用户数。
 
@@ -80,7 +80,7 @@
 
 ![image-20240228224250913](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402282242094.png)
 
-### 需求四：用户注册各窗口汇总表
+### 需求五：用户注册各窗口汇总表
 
 从 DWD 层用户注册表中读取数据，统计各窗口注册用户数。
 
@@ -91,7 +91,7 @@
 
 ![image-20240229101654217](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291016673.png)
 
-### 需求五：加购各窗口汇总表
+### 需求六：加购各窗口汇总表
 
 从 Kafka 读取用户加购明细数据，统计每日各窗口加购独立用户数。
 
@@ -103,7 +103,7 @@
 
 ![image-20240229102915362](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291029923.png)
 
-### 需求六：支付各窗口汇总表
+### 需求七：支付各窗口汇总表
 
 从 Kafka 读取交易域支付成功主题数据，统计当日支付成功独立用户数和首次支付成功用户数。
 
@@ -119,7 +119,7 @@
 
 ![image-20240229105750139](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291057669.png)
 
-### 需求七：下单各窗口汇总表
+### 需求八：下单各窗口汇总表
 
 从 Kafka 订单明细主题读取数据，对数据去重，统计当日下单独立用户数和新增下单用户数，封装为实体类，写入 ClickHouse。
 
@@ -128,3 +128,45 @@
 该需求和需求六基本相同。
 
 ![image-20240229110357557](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291103264.png)
+
+### 需求九：用户spu粒度下单汇总表
+
+从 Kafka 订单明细主题读取数据，过滤 null 数据并按照唯一键对数据去重，关联维度信息，按照维度分组，统计各维度各窗口的订单数和订单金额，将数据写入 ClickHouse 交易域品牌-品类-用户-SPU粒度下单各窗口汇总表。
+
+任务：
+
+1. 去重（上游使用了left join 存在撤回流，去重方案使用状态编程+定时器）
+2. map方法将JSONObject转换成JavaBean对象
+3. 关联HBase中的维表，补充spu_id，tm_id，category3_id
+4. 提取事件事件
+5. 分组开窗(user_id,spu_id,tm_id,category3_id)、聚合
+6. 关联维表补充spu_nam，tm_name，category3_name，category2_name，category1_name
+7. 将数据写入clikhouse执行
+
+关联维度表优化：
+
+1. 旁路缓存：参考HBase的读缓存模型，使用redis进行数据缓存，设计维度表的读缓存和写缓存。在读取维度数据时首先根据tablename+id作为key去redis中查找，如果redis中再去Hbase中查找然后将找到的数据缓存到redis。在ods-to-dim层如果获取到的某条数据的type=update说明是更新维度信息的，那么在更新前将redis中的缓存先删掉。
+2. 异步IO：虽然使用旁路缓存优化了数据读取速度，但是补充维度信息的map方法是同步方法，一条数据只能等待其返回结果下一条数据才能查询，这样大部分时间浪费在了等待返回结果上。因此使用flink提供的异步IO接口+线程池(双重校验的单例设计模式)+连接池实现异步IO，这样一个并行度可以同时处理多条数据。
+
+知识点：
+
+1. 对于泛型对象如果要获取其属性值有两种方法：
+   - 反射：通过泛型对象的class对象获取属性值。
+   - 抽象方法(一定是public)与抽象类：在new 一个抽象类时需要重写抽象方法，如果该抽象方法是一个泛型方法那么在重写方法时传入的类型九确定了，那么可以在重写的抽象方法里实现获取属性值。
+
+### 需求十：省份粒度下单汇总表
+
+从 Kafka 读取订单明细数据，过滤 null 数据并按照唯一键对数据去重，统计各省份各窗口订单数和订单金额，将数据写入 ClickHouse 交易域省份粒度下单各窗口汇总表。
+
+1. 从 Kafka订单明细主题读取数据
+
+2. 转换数据结构
+
+3. 按照唯一键去重（先keyby，然后状态编程+定时器）
+
+4. 转换数据结构（JSONObject 转换为实体类 TradeProvinceOrderWindow）
+5. 设置水位线
+6. 按照省份分组，开窗聚合
+7. 查询维表关联省份信息补全字段
+
+8. 写出到 ClickHouse，执行
