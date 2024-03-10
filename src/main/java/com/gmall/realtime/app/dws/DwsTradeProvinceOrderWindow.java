@@ -10,6 +10,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -19,6 +20,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -113,16 +115,22 @@ public class DwsTradeProvinceOrderWindow {
             }
         }));
         //TODO 7.开窗聚合
-        SingleOutputStreamOperator<TradeProvinceOrderWindow> reduceDs = tradeProWmDs.windowAll(TumblingEventTimeWindows.of(Time.seconds(10))).reduce(new ReduceFunction<TradeProvinceOrderWindow>() {
+        KeyedStream<TradeProvinceOrderWindow, String> KeyByProvincDs = tradeProWmDs.keyBy(new KeySelector<TradeProvinceOrderWindow, String>() {
+            @Override
+            public String getKey(TradeProvinceOrderWindow tradeProvinceOrderWindow) throws Exception {
+                return tradeProvinceOrderWindow.getProvinceId();
+            }
+        });
+        SingleOutputStreamOperator<TradeProvinceOrderWindow> reduceDs = KeyByProvincDs.window(TumblingEventTimeWindows.of(Time.seconds(10))).reduce(new ReduceFunction<TradeProvinceOrderWindow>() {
             @Override
             public TradeProvinceOrderWindow reduce(TradeProvinceOrderWindow value1, TradeProvinceOrderWindow value2) throws Exception {
                 value1.getOrderIdSet().addAll(value2.getOrderIdSet());
                 value1.setOrderAmount(value1.getOrderAmount() + value2.getOrderAmount());
                 return value1;
             }
-        }, new AllWindowFunction<TradeProvinceOrderWindow, TradeProvinceOrderWindow, TimeWindow>() {
+        }, new WindowFunction<TradeProvinceOrderWindow, TradeProvinceOrderWindow, String, TimeWindow>() {
             @Override
-            public void apply(TimeWindow timeWindow, Iterable<TradeProvinceOrderWindow> iterable, Collector<TradeProvinceOrderWindow> collector) throws Exception {
+            public void apply(String s, TimeWindow timeWindow, Iterable<TradeProvinceOrderWindow> iterable, Collector<TradeProvinceOrderWindow> collector) throws Exception {
                 TradeProvinceOrderWindow next = iterable.iterator().next();
                 next.setTs(System.currentTimeMillis());
                 next.setStt(DateFormatUtil.toYmdHms(timeWindow.getStart()));
