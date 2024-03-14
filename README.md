@@ -22,7 +22,15 @@
 
 ### 实验环境
 
-整个实验环境基于学校服务器内网搭建，使用Docker部署rtgMaster、rtgSlave1、rtgSlave2三个容器模拟实验环境。服务器配置：
+整个实验环境基于学校服务器内网搭建，使用Docker部署rtgMaster、rtgSlave1、rtgSlave2三个容器模拟实验环境。
+校内服务访问：
+
+| HDFS             | 172.21.13.53:9870  | 存放Hbase数据、Flink Checkpoint数据、每个Flink job存放的依赖以及日志 |
+| ---------------- | ------------------ | ------------------------------------------------------------ |
+| Yarn             | 172.21.13.53:8088  | 获取Flink Web Ui地址查看Flink job运行情况                    |
+| HBase            | 172.21.13.53:16010 | 查看维度表以及Hbase运行状态                                  |
+| JobHistoryServer | 172.21.13.53:19888 | 存放历史任务以及日志                                         |
+服务器配置：
 
 ![image-20240314152054052](https://raw.githubusercontent.com/LiuSung/Images/main/img/image-20240314152054052.png)
 
