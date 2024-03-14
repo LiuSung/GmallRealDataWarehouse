@@ -54,7 +54,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                     common.getString("ar"),
                     common.getString("is_new"),
                     1L, 0L, 0L, 0L, 0L,
-                    common.getLong("ts"));
+                    uvJson.getLong("ts"));
         });
         SingleOutputStreamOperator<TrafficPageViewBean> trafficPageViewWithUj = ujSource.map(line -> {
             JSONObject ujJson = JSON.parseObject(line);
@@ -65,7 +65,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                     common.getString("ar"),
                     common.getString("is_new"),
                     0L, 0L, 0L, 0L, 1L,
-                    common.getLong("ts"));
+                    ujJson.getLong("ts"));
         });
         SingleOutputStreamOperator<TrafficPageViewBean> trafficPageViewWithPage = pageSource.map(line -> {
             JSONObject pageJson = JSON.parseObject(line);
@@ -83,7 +83,7 @@ public class DwsTrafficVcChArIsNewPageViewWindow {
                     common.getString("ar"),
                     common.getString("is_new"),
                     0L, svCt, 1L, page.getLong("during_time"), 0L,
-                    common.getLong("ts"));
+                    pageJson.getLong("ts"));
         });
         //TODO 3. 统一数据格式进行union
         DataStream<TrafficPageViewBean> union = trafficPageViewWithUv.union(trafficPageViewWithUj).union(trafficPageViewWithPage);

@@ -4,7 +4,7 @@
 <configuration>
     <property>
         <name>hbase.rootdir</name>
-        <value>hdfs://192.168.100:9820/hbase</value>
+        <value>hdfs://172.19.133.10:9820/hbase</value>
     </property>
 
     <property>
@@ -14,7 +14,7 @@
 
     <property>
         <name>hbase.zookeeper.quorum</name>
-        <value>192.168.141.100,192.168.141.101,192.168.141.102</value>
+        <value>172.19.133.10,172.19.133.11,172.19.133.12</value>
     </property>
 
     <property>

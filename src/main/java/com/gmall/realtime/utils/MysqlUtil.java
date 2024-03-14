@@ -14,7 +14,7 @@ public class MysqlUtil {
     public static String mysqlLookUpTableDDL(String tableName){
         return "WITH (\n" +
                 "'connector' = 'jdbc',\n" +
-                "'url' = 'jdbc:mysql://192.168.141.100:3306/gmall',\n" +
+                "'url' = 'jdbc:mysql://172.19.133.10:3306/gmall',\n" +
                 "'table-name' = '" + tableName + "',\n" +
                 "'lookup.cache.max-rows' = '10',\n" +
                 "'lookup.cache.ttl' = '1 hour',\n" +

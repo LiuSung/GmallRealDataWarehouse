@@ -8,14 +8,14 @@ public class GmallConfig {
     public static final String PHOENIX_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
 
     // Phoenix连接参数
-    public static final String PHOENIX_SERVER = "jdbc:phoenix:192.168.141.100,192.168.141.101,192.168.141.102:2181";
+    public static final String PHOENIX_SERVER = "jdbc:phoenix:172.19.133.10,172.19.133.11,172.19.133.12:2181";
 
     // Kafka就能
-    public static final String KAFKA_SERVER = "192.168.141.100:9092,192.168.141.101:9092,192.168.141.102:9092";
+    public static final String KAFKA_SERVER = "172.19.133.10:9092,172.19.133.11:9092,172.19.133.12:9092";
 
     // ClickHouse 驱动
     public static final String CLICKHOUSE_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
 
     // ClickHouse 连接 URL
-    public static final String CLICKHOUSE_URL = "jdbc:clickhouse://192.168.141.100:8123/gmall_rebuild";
+    public static final String CLICKHOUSE_URL = "jdbc:clickhouse://172.19.133.12:8123/gmall_rebuild";
 }

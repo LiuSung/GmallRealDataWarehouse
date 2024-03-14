@@ -35,13 +35,13 @@ public class DwdTrafficUserJumpDetail {
         //TODO: 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-        env.enableCheckpointing(5*60000L, CheckpointingMode.EXACTLY_ONCE);
-        env.getCheckpointConfig().setCheckpointTimeout(10*60000L);
-        env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
-        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
-        env.setStateBackend(new HashMapStateBackend());
-        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
-        System.setProperty("HADOOP_USER_NAME","root");
+//        env.enableCheckpointing(5*60000L, CheckpointingMode.EXACTLY_ONCE);
+//        env.getCheckpointConfig().setCheckpointTimeout(10*60000L);
+//        env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
+//        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
+//        env.setStateBackend(new HashMapStateBackend());
+//        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
+//        System.setProperty("HADOOP_USER_NAME","root");
 
         //TODO: 获取page数据并定义水位线事件事件
         String topic = "dwd_traffic_page_log";

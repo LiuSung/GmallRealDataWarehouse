@@ -88,11 +88,11 @@ public class DwdTradeOrderRefund {
                 "    sku_id string, " +
                 "    province_id string, " +
                 "    refund_type string, " +
-                "    dic_name string, " +
+                "    type_dic_name string, " +
                 "    refund_num string, " +
                 "    refund_amount string, " +
                 "    refund_reason_type string, " +
-                "    dic_name string, " +
+                "    reason_dic_name string, " +
                 "    refund_reason_txt string, " +
                 "    refund_status string, " +
                 "    create_time string " +

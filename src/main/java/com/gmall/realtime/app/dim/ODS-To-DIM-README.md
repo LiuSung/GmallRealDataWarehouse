@@ -42,3 +42,31 @@ TODO
 #### ODS-To-DIM数据处理可视化
 
 ![image-20240111215429100](https://raw.githubusercontent.com/LiuSung/Images/main/img/202401132241316.png)
+
+#### 执行任务（flink on yarn）
+
+```
+bin/flink run -d -t yarn-per-job -c com.gmall.realtime.app.dim.DimApp flink-gmall-1.0-SNAPSHOT.jar
+```
+
+![image-20240313154547566](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403131545676.png)
+
+初始化tableprocess表将维表数据写入该表，如下图维表插入HBase中
+
+![image-20240313154745657](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403131548939.png)
+
+![image-20240313155744783](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403131557640.png)
+
+![image-20240313160102553](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403131601137.png)
+
+#### 造数据查看数据是否写入phoenix表中
+
+![image-20240313170007891](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403131700527.png)
+
+![image-20240313165937865](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403131659409.png)
+
+#### 遇到问题
+
+1. 实验环境为docker 环境，在docker commit 时会有多个版本的镜像，因为在打包镜像时zk和Hbase有多次start和stop导致zk保存的Hbase元数据与Hbase本身不一致。解决：因为还没有对维度数据进行初始化，所以在zkCli中直接rmr /hbase
+2. phoenix-5.0.0-HBase-2.0-client.jar 冲突问题：phoenix与打的jar包中phoenix-5.0.0-HBase-2.0-client.jar冲突，报错为Caused by: java.lang.ClassNotFoundException: org.apache.hadoop.mapreduce.InputFormat。解决：在pom文件中phoenix-5.0.0-HBase-2.0-client.jar位置`<scope>provided</scope>`掉，然后把phoenix-5.0.0-HBase-2.0-client.jar copy到 flink/lib下。
+3. Flink写入phoenix中的数据中文乱码：flink-con.yaml中添加：env.java.opts: -Dfile.encoding=UTF-8

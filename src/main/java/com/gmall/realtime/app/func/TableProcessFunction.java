@@ -61,6 +61,9 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
                 }
             }
             createTableSql.append(")").append(sinkExtend);
+            String sqlstring = createTableSql.toString();
+
+            System.out.println("建表语句为：" + sqlstring);
 
             //编译sql
             preparedStatement = connection.prepareStatement(createTableSql.toString());

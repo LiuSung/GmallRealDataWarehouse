@@ -28,7 +28,11 @@
 8. 使用map算子将String对象转换成KeyWordBean对象。
 9. 使用自定义的SinkFunction将数据写到clickhouse的dws_traffic_source_keyword_page_view_window表中。
 
-#### 目标效果
+**需要先开启BaseLogApp，再开启dwstrafficsourcekeywordpageviewwindow，因为该任务读取BaseLogApp任务写入dwd_traffic_page_log主题的数据**
+
+![image-20240313220213128](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132202073.png)
+
+#### 查看Clickhouse表结果
 
 ![image-20240123230917391](https://raw.githubusercontent.com/LiuSung/Images/main/img/202401232309161.png)
 
@@ -46,9 +50,13 @@
 6. 将TrafficPageViewBean数据写入ClickHouse。
 7. 启动任务执行。
 
-#### 目标效果
+**需要先开启BaseLogApp、dwdtrafficuserjumpdetail、dwdtrafficuniquevisitordetail任务**
 
-![image-20240129200647271](https://raw.githubusercontent.com/LiuSung/Images/main/img/202401292006687.png)
+![image-20240313221523545](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132215139.png)
+
+#### 查看Clickhouse表结果
+
+![image-20240313224320794](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132243815.png)
 
 ### 需求三：页面浏览个窗口汇总
 
@@ -65,7 +73,11 @@
 7. 将数据写入clickhouse
 8. 执行
 
+![image-20240313221335508](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132213525.png)
+
 ![image-20240228221909959](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402282219284.png)
+
+
 
 ### 需求四：用户登录各窗口汇总表
 
@@ -78,6 +90,8 @@
 5. 开窗全窗口，使用增量和全量结合的方式进行聚合
 6. 将数据写如clickhouse，执行。
 
+![image-20240313221358818](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132214181.png)
+
 ![image-20240228224250913](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402282242094.png)
 
 ### 需求五：用户注册各窗口汇总表
@@ -88,6 +102,10 @@
 2. string类型数据转换成UserRegisterBean数据。
 3. 全窗口开窗聚合
 4. 写入clickhouse执行
+
+任务开启顺序：dwduserregister—>dwsuseruserregisterwindow
+
+![image-20240313224641103](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132246165.png)
 
 ![image-20240229101654217](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291016673.png)
 
@@ -101,7 +119,11 @@
 4. 全窗口开窗，增量全量结合的方式聚合
 5. 写入clickhouse，执行程序。
 
-![image-20240229102915362](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291029923.png)
+任务开启顺序：dwdtradecartadd—>dwstradecartadduuwindow
+
+![image-20240313225146791](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132251035.png)
+
+![image-20240313225355691](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403132253315.png)
 
 ### 需求七：支付各窗口汇总表
 
@@ -109,13 +131,17 @@
 
 支付成功主题数据是由：支付详情表、订单详情表、订单明细表、活动表详情表、优惠券详情表，5张表join得到的数据，其中活动表详情表、优惠券详情表在join时使用left join，所以下游数据中存在撤回流数据，如果要计算订单等数据需要先对支付成功主题数据进行去重。
 
-1. fromSource读取dwd_trade_pay_detail_suc主题数据
+1. fromSource读取dwd_trade_pay_detail主题数据
 2. flatmap算子过滤null数据并将string转换成JSON
 3. 状态变成+定时器功能进行去重，如果状态==null，JSON更新到状态，注册5s定时器，如果状态!=null，判断当前JOSN与状态中JSON的生成时间哪个大，将大的更新到状态中。
 4. 按照user_id进行keyby
 5. flatmap去重（去重方法同上）并实现JSON到TradePaymentWindowBean的转换。
 6. 全窗口开窗，增量全量集合的方式进行聚合
 7. 写入clickhouse，执行程序。
+
+任务开启顺序：dwdtradeorderpreprocess（订单预处理任务）->dwdtradeorderdetail（订单明细任务）->dwdtradepaydetail（支付明细表）->dwstradepaymentsucwindow（支付个窗口汇总任务）
+
+![image-20240314093216670](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403140932593.png)
 
 ![image-20240229105750139](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291057669.png)
 
@@ -127,7 +153,9 @@
 
 该需求和需求六基本相同。
 
-![image-20240229110357557](https://raw.githubusercontent.com/LiuSung/Images/main/img/202402291103264.png)
+任务开启顺序：dwdtradeorderpreprocess（订单预处理任务）->dwdtradeorderdetail（订单明细任务）—>dwstradeorderwindow(下单各窗口汇总表)
+
+![image-20240314100030613](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403141000811.png)
 
 ### 需求九：用户spu粒度下单汇总表
 
@@ -154,6 +182,14 @@
    - 反射：通过泛型对象的class对象获取属性值。
    - 抽象方法(一定是public)与抽象类：在new 一个抽象类时需要重写抽象方法，如果该抽象方法是一个泛型方法那么在重写方法时传入的类型九确定了，那么可以在重写的抽象方法里实现获取属性值。
 
+任务开启顺序：dwdtradeorderpreprocess（订单预处理任务）->dwdtradeorderdetail（订单明细任务）—>dwstradeuserspuorderwindow（spu粒度下单汇总窗口）
+
+此外还需要开启redis服务
+
+![image-20240314140627187](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403141406887.png)
+
+![image-20240314100547981](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403141005088.png)
+
 ### 需求十：省份粒度下单汇总表
 
 从 Kafka 读取订单明细数据，过滤 null 数据并按照唯一键对数据去重，统计各省份各窗口订单数和订单金额，将数据写入 ClickHouse 交易域省份粒度下单各窗口汇总表。
@@ -170,3 +206,13 @@
 7. 查询维表关联省份信息补全字段
 
 8. 写出到 ClickHouse，执行
+
+wdtradeorderpreprocess（订单预处理任务）->dwdtradeorderdetail（订单明细任务）—>dwstradeprovinceorderwindow（省份粒度下单汇总窗口）
+
+![image-20240314100521322](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403141005021.png)
+
+![image-20240314101913426](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403141019712.png)
+
+Redis中缓存数据：
+
+![image-20240314123607567](https://raw.githubusercontent.com/LiuSung/Images/main/img/202403141236001.png)

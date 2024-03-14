@@ -44,7 +44,7 @@ public class DwdInteractionComment {
                 "data['order_id'] order_id, " +
                 "data['create_time'] create_time, " +
                 "data['appraise'] appraise, " +
-                "proc_time " +
+                "`pt` pt " +
                 "from topic_db " +
                 "where `table` = 'comment_info' " +
                 "and `type` = 'insert' ");
@@ -65,7 +65,7 @@ public class DwdInteractionComment {
                 "dic.dic_name " +
                 "from comment_info ci " +
                 "join " +
-                "base_dic for system_time as of ci.proc_time as dic " +
+                "base_dic for system_time as of ci.pt as dic " +
                 "on ci.appraise = dic.dic_code");
         tableEnv.createTemporaryView("result_table", resultTable);
 

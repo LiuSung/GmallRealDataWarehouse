@@ -124,11 +124,11 @@ public class BaseLogApp {
         DataStream<String> actionDS = pageDS.getSideOutput(actionTag);
 
         //TODO: 写出到对应主题
-//        errDS.print("err>>>>>>>");
-//        startDs.print("start>>>>>>");
-//        displayDs.print("display>>>>>>");
-//        actionDS.print("action>>>>>>");
-//        pageDS.print("page>>>>>>>>");
+        errDS.print("err>>>>>>>");
+        startDs.print("start>>>>>>");
+        displayDs.print("display>>>>>>");
+        actionDS.print("action>>>>>>");
+        pageDS.print("page>>>>>>>>");
 
         String page_topic = "dwd_traffic_page_log";
         String start_topic = "dwd_traffic_start_log";

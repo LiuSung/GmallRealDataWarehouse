@@ -111,8 +111,8 @@ public class DwsTradeUserSpuOrderWindow {
                     @Override
                     public void join(TradeUserSpuOrderBean input, JSONObject diminfo) {
                         input.setSpuId(diminfo.getString("SPU_ID"));
-                        input.setSpuId(diminfo.getString("TM_ID"));
-                        input.setSpuId(diminfo.getString("CATEGORY3_ID"));
+                        input.setTrademarkId(diminfo.getString("TM_ID"));
+                        input.setCategory3Id(diminfo.getString("CATEGORY3_ID"));
                     }
                 },
                 100,
@@ -156,7 +156,7 @@ public class DwsTradeUserSpuOrderWindow {
                 });
         //TODO 10. 关联sup,tm,category维表补充相应的信息
         //10.1关联sup_name
-        SingleOutputStreamOperator<TradeUserSpuOrderBean> redultWithSpu = AsyncDataStream.unorderedWait(resultDs, new DimAsyncFunction<TradeUserSpuOrderBean>("DIM_SUP_INFO") {
+        SingleOutputStreamOperator<TradeUserSpuOrderBean> redultWithSpu = AsyncDataStream.unorderedWait(resultDs, new DimAsyncFunction<TradeUserSpuOrderBean>("DIM_SPU_INFO") {
             @Override
             public String getKey(TradeUserSpuOrderBean input) {
                 return input.getSpuId();

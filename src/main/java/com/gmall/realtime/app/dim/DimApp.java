@@ -31,15 +31,15 @@ public class DimApp {
         //todo 1. 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
-        //1.1 开启checkpoint
-        env.enableCheckpointing(5 * 60000L, CheckpointingMode.EXACTLY_ONCE);
-        env.getCheckpointConfig().setCheckpointTimeout(10 * 60000L);
-        env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
-        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
-        //1.2 设置状态后端
-        env.setStateBackend(new HashMapStateBackend());
-        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
-        System.setProperty("HADOOP_USER_NAME","root");
+//        //1.1 开启checkpoint
+//        env.enableCheckpointing(5 * 60000L, CheckpointingMode.EXACTLY_ONCE);
+//        env.getCheckpointConfig().setCheckpointTimeout(10 * 60000L);
+//        env.getCheckpointConfig().setMaxConcurrentCheckpoints(2);
+//        env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3,5000L));
+//        //1.2 设置状态后端
+//        env.setStateBackend(new HashMapStateBackend());
+//        env.getCheckpointConfig().setCheckpointStorage("hdfs://192.168.141.100:9820/flink/ck");
+//        System.setProperty("HADOOP_USER_NAME","root");
 
         //todo 2. 读取kafka topic_db主题数据创建主流
         String topic = "topic_db";
@@ -62,12 +62,12 @@ public class DimApp {
         });
         //todo 4. 使用flinkCDC 读取Mysql配置信息创建配置流
         MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
-                .hostname("192.168.141.100")
+                .hostname("172.19.133.10")
                 .port(3306)
                 .username("root")
                 .password("000000")
-                .databaseList("gmall-config")
-                .tableList("gmall-config.table_process")
+                .databaseList("gmall_config")
+                .tableList("gmall_config.table_process")
                 .startupOptions(StartupOptions.initial())
                 .deserializer(new JsonDebeziumDeserializationSchema())
                 .build();
