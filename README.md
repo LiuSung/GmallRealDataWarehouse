@@ -23,6 +23,7 @@
 ### 实验环境
 
 整个实验环境基于学校服务器内网搭建，使用Docker部署rtgMaster、rtgSlave1、rtgSlave2三个容器模拟实验环境。
+
 校内服务访问：
 
 | HDFS             | 172.21.13.53:9870  | 存放Hbase数据、Flink Checkpoint数据、每个Flink job存放的依赖以及日志 |
