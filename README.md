@@ -8,7 +8,7 @@
 
    详见：[Ods-To-Dim任务Readme](https://github.com/LiuSung/GmallRealDataWarehouse/blob/master/src/main/java/com/gmall/realtime/app/dim/ODS-To-DIM-README.md)
 
-2. Ods-To-Dwd：将Ods层的用户行为数据以及业务数据经过增数据去除、主题数据过滤等操作写入到对应主题的kafka中。
+2. Ods-To-Dwd：将Ods层的用户行为数据以及业务数据经过脏数据去除、主题数据过滤等操作写入到对应主题的kafka中。
 
    详见：[Ods-To-Dwd行为数据Readme](https://github.com/LiuSung/GmallRealDataWarehouse/blob/master/src/main/java/com/gmall/realtime/app/dwd/log/ODS%E5%B1%82%E7%94%A8%E6%88%B7%E8%A1%8C%E4%B8%BA%E6%97%A5%E5%BF%97-To-DWD.md)  、  [Ods-To-Dwd业务数据Readme](https://github.com/LiuSung/GmallRealDataWarehouse/blob/master/src/main/java/com/gmall/realtime/app/dwd/db/ODS%E5%B1%82%E4%B8%9A%E5%8A%A1%E6%95%B0%E6%8D%AE-To-DWD.md)
 
@@ -54,6 +54,7 @@ rtgMaster、rtgSlave1、rtgSlave2节点服务分布如下表所示。
 | Flink           |           | √         |           |
 | Clickhouse      |           |           | √         |
 | Redis           |           |           | √         |
+| Mysql           | √         |           |           |
 | Flume           | √         | √         |           |
 | Kafka           | √         | √         | √         |
 
