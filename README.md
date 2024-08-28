@@ -12,7 +12,7 @@
 
    详见：[Ods-To-Dwd行为数据Readme](https://github.com/LiuSung/GmallRealDataWarehouse/blob/master/src/main/java/com/gmall/realtime/app/dwd/log/ODS%E5%B1%82%E7%94%A8%E6%88%B7%E8%A1%8C%E4%B8%BA%E6%97%A5%E5%BF%97-To-DWD.md)  、  [Ods-To-Dwd业务数据Readme](https://github.com/LiuSung/GmallRealDataWarehouse/blob/master/src/main/java/com/gmall/realtime/app/dwd/db/ODS%E5%B1%82%E4%B8%9A%E5%8A%A1%E6%95%B0%E6%8D%AE-To-DWD.md)
 
-3. Dwd-To-Dws：用户域：用户登录数以及7日用户回流数、用户注册数。流量域：首页以及商品详情页独立访客数、关键词搜索数。交易域：加购物数汇总表、支付窗口汇总表、下单窗口汇总表、spu粒度下单汇总表、省份粒度下单汇总表。
+3. Dwd-To-Dws：用户域：用户登录数以及7日用户回流数、用户注册数。流量域：首页以及商品详情页独立访客数。交易域：加购物数汇总表、支付窗口汇总表、下单窗口汇总表、spu粒度下单汇总表、省份粒度下单汇总表。
 
    详见：[Dwd-To-Dws轻度汇总Readme](https://github.com/LiuSung/GmallRealDataWarehouse/blob/master/src/main/java/com/gmall/realtime/app/dws/Dwd-To-Dws%E8%BD%BB%E5%BA%A6%E6%95%B0%E6%8D%AE%E6%B1%87%E6%80%BB.md)
 
